@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"online-cinema/databases"
 	"online-cinema/pkg/mysql"
 	"online-cinema/routes"
 	"os"
+
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -38,6 +39,6 @@ func main() {
 	var port = os.Getenv("PORT")
 
 	fmt.Println("SERVER Running on Port 8000")
-	http.ListenAndServe("localhost:"+port, handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(r))
+	http.ListenAndServe(":"+port, handlers.CORS(allowedHeaders, allowedMethods, allowedOrigins)(r))
 
 }

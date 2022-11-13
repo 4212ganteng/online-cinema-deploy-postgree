@@ -49,6 +49,7 @@ func UploadFile(next http.HandlerFunc) http.HandlerFunc {
 
 		tempFile.Write(fileBytes)
 
+		// same with local and cloudinary
 		data := tempFile.Name()
 		filename := data[8:]
 

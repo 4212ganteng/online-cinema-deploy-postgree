@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,8 +12,17 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gorilla/mux"
 )
+
+// Cloudinary
+// Declare Context Background, Cloud Name, API Key, API Secret here ...
+var ctx = context.Background()
+var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+var API_KEY = os.Getenv("API_KEY")
+var API_SECRET = os.Getenv("API_SECRET")
 
 type handlerFilm struct {
 	FilmRepository repositories.FilmRepository
@@ -36,6 +46,12 @@ func (h *handlerFilm) GetFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// add manipulation path file on this below code ...
+	for i, p := range film {
+		imagePath := os.Getenv("PATH_FILE") + p.Image
+		film[i].Image = imagePath
+	}
+
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Status: "Success", Data: film}
 	json.NewEncoder(w).Encode(response)
@@ -54,6 +70,9 @@ func (h *handlerFilm) GetFilmId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Add manipulation path file on this below code ...
+	film.Image = os.Getenv("PATH_FILE") + film.Image
+
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Status: "Success", Data: film}
 	json.NewEncoder(w).Encode(response)
@@ -62,19 +81,33 @@ func (h *handlerFilm) GetFilmId(w http.ResponseWriter, r *http.Request) {
 func (h *handlerFilm) CreateFilm(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	dataUpload := r.Context().Value("dataFile")
-	filename := dataUpload.(string)
+	// get image filepath after cloudinary
+	dataContex := r.Context().Value("dataFile")
+	filepath := dataContex.(string)
 
 	price, _ := strconv.Atoi(r.FormValue("price"))
 	category, err := strconv.Atoi(r.FormValue("category_id"))
+
+	// Add your Cloudinary credentials ...
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	// Upload file to Cloudinary ...
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "dumbmerch_file_b40"})
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	// Upload file to Cloudinary here ...
 
 	Field := models.Film{
 		Title:       r.FormValue("title"),
 		Description: r.FormValue("description"),
 		Price:       price,
 		FilmUrl:     r.FormValue("filmUrl"),
-		Image:       os.Getenv("PATH_FILE") + filename,
-		CategoryID:  category,
+		// Image:    filename, // Modify store file URL to database from resp.SecureURL here ...
+		Image:      resp.SecureURL,
+		CategoryID: category,
 	}
 
 	film, err := h.FilmRepository.CreateFilm(Field)

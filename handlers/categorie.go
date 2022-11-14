@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"net/http"
 	"online-cinema/dto"
 	"online-cinema/dto/categories"
 	"online-cinema/models"
 	"online-cinema/repositories"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 type handlercategory struct {
@@ -88,9 +89,9 @@ func (h *handlercategory) UpdateCategory(w http.ResponseWriter, r *http.Request)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	var request categories.CategoryRequest
-	request = categories.CategoryRequest{
-		Name: r.FormValue("name"),
-	}
+	// request = categories.CategoryRequest{
+	// 	Name: r.FormValue("name"),
+	// }
 	categoryModel := models.Categorie{}
 	if request.Name != "" {
 		categoryModel.Name = request.Name

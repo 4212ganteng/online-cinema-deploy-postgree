@@ -125,20 +125,26 @@ func (h *handlerFilm) CreateFilm(w http.ResponseWriter, r *http.Request) {
 
 func (h *handlerFilm) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	dataUpload := r.Context().Value("dataFile")
-	filename := dataUpload.(string)
+	// get image filepath after cloudinary
+	dataContex := r.Context().Value("dataFile")
+	filepath := dataContex.(string)
 
 	price, _ := strconv.Atoi(r.FormValue("price"))
 	category, _ := strconv.Atoi(r.FormValue("category_id"))
 
+	// Add your Cloudinary credentials ...
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	// Upload file to Cloudinary ...
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "dumbmerch_file_b40"})
 	request := film.CreateFilmRequest{
 		Title:       r.FormValue("title"),
 		Description: r.FormValue("description"),
 		Price:       price,
 		FilmUrl:     r.FormValue("filmUrl"),
-		Image:       os.Getenv("PATH_FILE") + filename,
-		CategoryID:  category,
+		// Image:    filename, // Modify store file URL to database from resp.SecureURL here ...
+		Image:      resp.SecureURL,
+		CategoryID: category,
 	}
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
@@ -155,7 +161,7 @@ func (h *handlerFilm) UpdateFilm(w http.ResponseWriter, r *http.Request) {
 		film.Price = request.Price
 	}
 
-	if filename != "" {
+	if filepath != "" {
 		film.Image = request.Image
 	}
 

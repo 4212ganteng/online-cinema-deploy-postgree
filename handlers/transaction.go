@@ -178,6 +178,7 @@ func (h *handlerTransaction) Notification(w http.ResponseWriter, r *http.Request
 	// fmt.Println("INI MASUK NOTIFIKASI FRAUD STATUS :", fraudStatus)
 	// fmt.Println("INI MASUK NOTIFIKASI FRAUD ORDERID :", orderId)
 
+	// gomail
 	transaction, _ := h.TransactionRepository.GetOneTransaction(orderId)
 
 	if transactionStatus == "capture" {

@@ -179,7 +179,7 @@ func (h *handlerTransaction) Notification(w http.ResponseWriter, r *http.Request
 	// fmt.Println("INI MASUK NOTIFIKASI FRAUD ORDERID :", orderId)
 
 	// gomail
-	transaction, _ := h.TransactionRepository.GetOneTransaction(orderId)
+	// transaction, _ := h.TransactionRepository.GetOneTransaction(orderId)
 
 	if transactionStatus == "capture" {
 		if fraudStatus == "challenge" {
@@ -188,21 +188,21 @@ func (h *handlerTransaction) Notification(w http.ResponseWriter, r *http.Request
 			h.TransactionRepository.UpdateTransaction("pending", orderId)
 		} else if fraudStatus == "accept" {
 			// TODO set transaction status on your database to 'success'
-			SendMail("success", transaction)
+			// SendMail("success", transaction)
 			h.TransactionRepository.UpdateTransaction("success", orderId)
 		}
 	} else if transactionStatus == "settlement" {
 		// TODO set transaction status on your databaase to 'success'
-		SendMail("success", transaction)
+		// SendMail("success", transaction)
 		h.TransactionRepository.UpdateTransaction("success", orderId)
 	} else if transactionStatus == "deny" {
 		// TODO you can ignore 'deny', because most of the time it allows payment retries
 		// and later can become success
-		SendMail("failed", transaction)
+		// SendMail("failed", transaction)
 		h.TransactionRepository.UpdateTransaction("failed", orderId)
 	} else if transactionStatus == "cancel" || transactionStatus == "expire" {
 		// TODO set transaction status on your databaase to 'failure'
-		SendMail("failed", transaction)
+		// SendMail("failed", transaction)
 		h.TransactionRepository.UpdateTransaction("failed", orderId)
 	} else if transactionStatus == "pending" {
 		// TODO set transaction status on your databaase to 'pending' / waiting payment

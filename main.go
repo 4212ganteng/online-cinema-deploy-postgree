@@ -15,6 +15,10 @@ import (
 )
 
 func main() {
+
+	if err := godotenv.Load(); err != nil {
+		log.Println(" No ENV file found")
+	}
 	//mysql database init
 	mysql.DAtabaseInit()
 	//migration
@@ -28,9 +32,7 @@ func main() {
 	r.PathPrefix("/uploads").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 
 	//env
-	if err := godotenv.Load(); err != nil {
-		log.Println(" No ENV file found")
-	}
+
 	//	cors
 	var allowedHeaders = handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	var allowedMethods = handlers.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"})
